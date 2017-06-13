@@ -148,7 +148,7 @@ class IMU:
         # Returns z-component from gyroscope in dps
         val = float(self.getGyroZ())
         limit = float(self.getGyroRangeDps())
-        return val * limit / 0x8FFF
+        return val * limit / 0x7FFF
 
     def getAccelG(self):
         # Returns accelerometer data in all directions in g's
