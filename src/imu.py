@@ -1,4 +1,5 @@
 from smbus import SMBus
+import time
 
 def twos_complement(val, bits):
     # Converts two's complement number to regular expression
@@ -26,7 +27,9 @@ class IMU:
         self._mag_x_ = 0x03
         self._mag_y_ = 0x05
         self._mag_z_ = 0x07
+        self._mag_read_timeout_ = 1
         self._mag_st2_ = 0x09
+        self._mag_st1_ = 0x02
         self._mag_cntl1_ = 0x0A
 
         # Enable bypass so we can talk to magnetometer
@@ -36,7 +39,7 @@ class IMU:
 
         # Configure magnetometer in continuous mode
         mag_config = self.bus.read_byte_data(self._mag_addr_, self._mag_cntl1_)
-        mag_config = mag_config | 0x12 # 16 bit, Continuous mode 1
+        mag_config = mag_config | 0x16 # 16 bit, Continuous mode 2
         self.bus.write_byte_data(self._mag_addr_, self._mag_cntl1_, mag_config)
 
 
@@ -84,25 +87,40 @@ class IMU:
 
     def getMagX(self):
         # Returns raw x-component from magnetometer
+        timeout_start = time.time()
+        while ( self.bus.read_byte_data(self._mag_addr_, self._mag_st1_) & 0x1 ) is 0:
+            if (time.time() - timeout_start) > self._mag_read_timeout_:
+                print "Mag read timeout"
+                return 0
         low_byte = self.bus.read_byte_data(self._mag_addr_, self._mag_x_)
         high_byte = self.bus.read_byte_data(self._mag_addr_, self._mag_x_ + 1)
-        overflow = self.bus.read_byte_data(self._mag_addr_, self._mag_st2_)
+        ovrflow = self.bus.read_byte_data(self._mag_addr_, self._mag_st2_)
         data_raw = (high_byte << 8) | low_byte
         return twos_complement(data_raw, 16)
 
     def getMagY(self):
         # Returns raw y-component from magnetometer
+        timeout_start = time.time()
+        while ( self.bus.read_byte_data(self._mag_addr_, self._mag_st1_) & 0x1 ) is 0:
+            if (time.time() - timeout_start) > self._mag_read_timeout_:
+                print "Mag read timeout"
+                return 0
         low_byte = self.bus.read_byte_data(self._mag_addr_, self._mag_y_)
         high_byte = self.bus.read_byte_data(self._mag_addr_, self._mag_y_ + 1)
-        overflow = self.bus.read_byte_data(self._mag_addr_, self._mag_st2_)
+        ovrflow = self.bus.read_byte_data(self._mag_addr_, self._mag_st2_)
         data_raw = (high_byte << 8) | low_byte
         return twos_complement(data_raw, 16)
 
     def getMagZ(self):
         # Returns raw z-component from magnetometer
+        timeout_start = time.time()
+        while ( self.bus.read_byte_data(self._mag_addr_, self._mag_st1_) & 0x1 ) is 0:
+            if (time.time() - timeout_start) > self._mag_read_timeout_:
+                print "Mag read timeout"
+                return 0
         low_byte = self.bus.read_byte_data(self._mag_addr_, self._mag_z_)
         high_byte = self.bus.read_byte_data(self._mag_addr_, self._mag_z_ + 1)
-        overflow = self.bus.read_byte_data(self._mag_addr_, self._mag_st2_)
+        ovrflow = self.bus.read_byte_data(self._mag_addr_, self._mag_st2_)
         data_raw = (high_byte << 8) | low_byte
         return twos_complement(data_raw, 16)
         
