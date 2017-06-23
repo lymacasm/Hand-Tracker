@@ -1,6 +1,9 @@
 led / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.py~
+*.py.swp
+*.py.swo
 
 # C extensions
 *.so
