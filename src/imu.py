@@ -1,4 +1,5 @@
 from smbus import SMBus
+import math
 import time
 
 def twos_complement(val, bits):
@@ -131,11 +132,21 @@ class IMU:
 
     def getAccel(self):
         # Returns dictionary with raw accelerometer readings in each direction
-        return {'x':self.getAccelX(), 'y':self.getAccelY(), 'z':self.getAccelZ()}
+        x = self.getAccelX()
+        #time.sleep(0.0001)
+        y = self.getAccelY()
+        #time.sleep(0.0001)
+        z = self.getAccelZ()
+        return {'x':x, 'y':y, 'z':z}
 
     def getGyro(self):
         # Returns dictionary with raw gyroscope readings in each direction
-        return {'x':self.getGyroX(), 'y':self.getGyroY(), 'z':self.getGyroZ()}
+        x = self.getGyroX()
+        #time.sleep(0.0008)
+        y = self.getGyroY()
+        #time.sleep(0.0008)
+        z = self.getGyroZ()
+        return {'x':x, 'y':y, 'z':z}
 
     def getMag(self):
         # Returns dictionary with raw magnetometer readings in each direction
@@ -252,6 +263,12 @@ class IMU:
             raise ValueError("Limit must be one of the following: %s" % self._accel_limits_)
         return float(raw) * float(limit) / 0x7FFF
 
+    def convertAccelVecToG(self, raw_vector, limit):
+        x = convertAccelToG(raw_vector['x'], limit)
+        y = convertAccelToG(raw_vector['y'], limit)
+        z = convertAccelToG(raw_vector['z'], limit)
+        return {'x':x, 'y':y, 'z':z}
+
     def convertGyroToDps(self, raw, limit):
         # Converts raw gyroscope data to dps. User is responsible
         # to remember the setting when data was collected.
@@ -263,3 +280,17 @@ class IMU:
         # Converts raw magnetometer data to uT
         limit = float(self.getMagRangeuT())
         return float(raw) * limit / 0x7FF8
+
+    def getRollAccel(self):
+        Ry = self.getAccelY()
+        Rz = self.getAccelZ()
+        return math.atan2(Ry, Rz) * 180 / math.pi
+
+    def getPitchAccel(self):
+        Rz = self.getAccelZ()
+        Rx = self.getAccelX()
+        return math.atan2(Rx, Rz) * -180 / math.pi
+
+    def magVector(self, vector):
+        sqrd_sum = vector['x']*vector['x'] + vector['y']*vector['y'] + vector['z']*vector['z']
+        return math.sqrt(sqrd_sum)
