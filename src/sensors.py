@@ -13,7 +13,7 @@ class Sensors(object):
         self._thread = threading.Thread(target=self._orientation_update_thread, args=())
         self._thread.start()
 
-    def _orientation_update_thread(self):
+    def __orientation_update_thread(self):
         accel_threshold = 0.2
         gyro_threshold = 10
         
