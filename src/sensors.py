@@ -1,4 +1,5 @@
 from imu import IMU
+from SerialController import SerialController
 import time
 import threading
 
@@ -10,6 +11,8 @@ class Sensors(object):
         self.roll = 0
         self.pitch = 0
         self._orientation = "None"
+		self.flex = SerialContoller()
+		flex.initialize()
         self._thread = threading.Thread(target=self._orientation_update_thread, args=())
         self._thread.start()
 
