@@ -1,18 +1,13 @@
-import serial
-
-##TODO: Change reading individual fingers to one read command which recieves all three finger
-##      Data at once. Parse the data using int(stuff.encode('hex')) or similar
-##      Add read() and write() and readline() methods which simply call ser.XXX()
-##      Store all fingers in a list/dictionary
-##      
+import serial, struct
 
 class SerialController:
 	#This class provides functions for receiving data from the ADC
 	debugMode = False #Sets the debug mode
 	baudrate = 9600  #Sets the baudrate of the serial controller
-	readCmd = 'r' #Sets the command to send to the ADC to read the values
-	numChars = 10 #Sets the number of characters to be returned
-	data = [0, 0, 0] #List containing the flex sensor data
+	readCmd = 'r'  #Sets the command to send to the ADC to read the values
+	numChars = 6 #Sets the number of characters to be returned
+	data = [0, 0, 0] #List containing the unparsed flex sensor data
+	fings = [0, 0, 0] #List containing the parsed data
 
 	#default constructor
 	def __init__(self):
@@ -31,34 +26,43 @@ class SerialController:
 		self.ser = serial.Serial ("/dev/ttyS0")
 		self.ser.baudrate = self.baudrate
 	
-	#readFingers()
+	#readFingers
 	#Sends the command to read the fingers' value
-	#Returns nothing, but stores the data received in the 'data' dictionary
+	#Stores the data in the 'data' list and the parsed data
+	#	in the fings list
 	def  readFingers(self): 
-		if(debugMode):
-		print 'Sending command '+ self.readCmd + '.'
+		if(self.debugMode):
+			print 'Sending command ' + self.readCmd + '.'
 		self.ser.write(self.readCmd)
-		vals = self.ser.read(numChars)
-		for i in range(0,2):
-			self.data[i] = int(vals[i].encode('hex'))
-			
-	
-	#read()
-	#Reads numChars amount of data from UART
+		for i in range(3):
+			self.data[i] = self.read(self.numChars/3)
+			self.fings[i] = struct.unpack('<H',self.data[i])[0]
+		if(self.debugMode):
+			print 'Received data ' + self.data + '.'
+			print 'Parsed data as ' + self.fings + '.'
+		
+
+	#read(num)
+	#Reads num amount of data from UART
 	#Returns the data read
-	def read(self):
-		data = self.ser.read(numChars)
-		if(debugMode):
-			print 'Received data ' + data + '.'
+	def read(self,num):
+		data = self.ser.read(num)
+		if(self.debugMode):
+			print 'Receieved data ' + data + '.'
 		return data
 
-	#Write()
-	#Writes the string str to UART	
-	def write(self, str):
-		if(debugMode):
-			print 'Writing string ' + str + '.'
-		self.ser.write(str)
+	#readline()
+	#Reads a line from UART
+	def readline(self):
+		if(self.debugMode):
+			print 'Reading a line'
+		data = self.ser.readline()
+		if(self.debugMode):
+			print 'Received data = ' + data + '.'
+		return data
 
-		
-	
-	
+	#flush()
+	#Flushes the buffer 
+	def flush(self):
+		self.ser.flush()
+
