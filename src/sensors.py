@@ -1,4 +1,5 @@
 from imu import IMU
+from SerialController import SerialController
 import time
 import threading
 
@@ -7,6 +8,8 @@ class Sensors(object):
         self.imu = IMU()
         self.imu.setAccelRangeG(8)
         self.imu.setGyroRangeDps(2000)
+		self.flex = SerialContoller()
+		self.flex.initialize()
         self.roll = 0
         self.pitch = 0
         self._orientation = "None"
