@@ -10,7 +10,7 @@ class Sensors(object):
         self.roll = 0
         self.pitch = 0
         self._orientation = "None"
-        self._thread = threading.Thread(target=self._orientation_update_thread, args=())
+        self._thread = threading.Thread(target=self.__orientation_update_thread, args=())
         self._thread.start()
 
     def __orientation_update_thread(self):
