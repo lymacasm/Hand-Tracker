@@ -263,10 +263,11 @@ class IMU:
             raise ValueError("Limit must be one of the following: %s" % self._accel_limits_)
         return float(raw) * float(limit) / 0x7FFF
 
-    def convertAccelVecToG(self, raw_vector, limit):
-        x = convertAccelToG(raw_vector['x'], limit)
-        y = convertAccelToG(raw_vector['y'], limit)
-        z = convertAccelToG(raw_vector['z'], limit)
+    def convertAccelVecToG(self, raw_vector):
+        limit = self.getAccelRangeG()
+        x = self.convertAccelToG(raw_vector['x'], limit)
+        y = self.convertAccelToG(raw_vector['y'], limit)
+        z = self.convertAccelToG(raw_vector['z'], limit)
         return {'x':x, 'y':y, 'z':z}
 
     def convertGyroToDps(self, raw, limit):
@@ -276,19 +277,38 @@ class IMU:
             raise ValueError("Limit must be one of the following: %s" % self._gyro_limits_)
         return float(raw) * float(limit) / 0x7FFF
 
+    def convertGyroVecToDps(self, raw_vector):
+        limit = self.getGyroRangeDps()
+        x = self.convertGyroToDps(raw_vector['x'], limit)
+        y = self.convertGyroToDps(raw_vector['y'], limit)
+        z = self.convertGyroToDps(raw_vector['z'], limit)
+        return {'x':x, 'y':y, 'z':z}
+
     def convertMagTouT(self, raw):
         # Converts raw magnetometer data to uT
         limit = float(self.getMagRangeuT())
         return float(raw) * limit / 0x7FF8
 
-    def getRollAccel(self):
-        Ry = self.getAccelY()
-        Rz = self.getAccelZ()
+    def getRollAccel(self, accel_dict=None):
+        Ry = 0
+        Rz = 0
+        if accel_dict is None:
+            Ry = self.getAccelY()
+            Rz = self.getAccelZ()
+        else:
+            Ry = accel_dict['y']
+            Rz = accel_dict['z']
         return math.atan2(Ry, Rz) * 180 / math.pi
 
-    def getPitchAccel(self):
-        Rz = self.getAccelZ()
-        Rx = self.getAccelX()
+    def getPitchAccel(self, accel_dict=None):
+        Rx = 0
+        Rz = 0
+        if accel_dict is None:
+            Rx = self.getAccelX()
+            Rz = self.getAccelZ()
+        else:
+            Rx = accel_dict['x']
+            Rz = accel_dict['z']
         return math.atan2(Rx, Rz) * -180 / math.pi
 
     def magVector(self, vector):
