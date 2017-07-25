@@ -62,10 +62,8 @@ class Sensors(object):
             time_queue.append(time.time())
 
             # Apply median filter to IMU readings, and convert to appropriate units
-            filtered_accel = \
-                {'x':self.__accel_x_filter.median(), 'y':self.__accel_y_filter.median(), 'z':self.__accel_z_filter.median()}
-            filtered_gyro = \
-                {'x':self.__gyro_x_filter.median(), 'y':self.__gyro_y_filter.median(), 'z':self.__gyro_z_filter.median()}
+            filtered_accel = self.accel
+            filtered_gyro = self.gyro
             accel_g = self.imu.convertAccelVecToG(filtered_accel)
             gyro_dps = self.imu.convertGyroVecToDps(filtered_gyro)
 
@@ -88,23 +86,29 @@ class Sensors(object):
             self.__fing0_filter.add_data(self.flex.fings[0])
             self.__fing1_filter.add_data(self.flex.fings[1])
             self.__fing2_filter.add_data(self.flex.fings[2])
-            fing_avg = float(self.__fing0_filter.median() + self.__fing1_filter.median() + self.__fing2_filter.median()) / 3.0
+            fing_avg = float(self.fing1 + self.fing2) / 2.0
             self.__fing_avg_filter.add_data(fing_avg)
                 
     @property
     def roll(self):
-        return self.__roll_filter.mean()
+        return self.__roll_filter.median()
 
     @property
     def pitch(self):
-        return self.__pitch_filter.mean()
+        return self.__pitch_filter.median()
 
     @property
     def speed(self):
-        if self.fings > 3000:
+        max_speed = 100
+        max_fings = 3350
+        min_fings = 2350
+        if self.fings > max_fings:
             return 0
+        elif self.fings < min_fings:
+            return max_speed
         else:
-            return 70
+            speed = max_speed - (self.fings - min_fings) * max_speed / (max_fings - min_fings)
+            return speed
 
     @property
     def fings(self):
@@ -121,28 +125,60 @@ class Sensors(object):
     @property
     def fing2(self):
         return self.__fing2_filter.median()
+    
+    @property
+    def accelx(self):
+        return self.__accel_x_filter.mean()
+
+    @property
+    def accely(self):
+        return self.__accel_y_filter.mean()
+
+    @property
+    def accelz(self):
+        return self.__accel_z_filter.mean()
+
+    @property
+    def gyrox(self):
+        return self.__gyro_x_filter.mean()
+
+    @property
+    def gyroy(self):
+        return self.__gyro_y_filter.mean()
+
+    @property
+    def gyroz(self):
+        return self.__gyro_z_filter.mean()
+
+    @property
+    def accel(self):
+        return {"x":self.accelx, "y":self.accely, "z":self.accelz}
+
+    @property
+    def gyro(self):
+        return {"x":self.gyrox, "y":self.gyroy, "z":self.gyroz}
  
     @property
     def orientation(self):
         # Define centroids for each class
-        up_center = -7
-        right_center = -110
-        left_center = 80
-        down_center = 176
+        up_center = -12
+        right_center = -90
+        left_center = 87
+        down_center = 173
 
         # Define thresholds for each class
-        up_threshold = 25
-        right_threshold = 35
-        left_threshold = 55
+        up_threshold = 47
+        right_threshold = 25
+        left_threshold = 50
         down_threshold = 30
 
         if (up_center - up_threshold) < self.roll < (up_center + up_threshold):
-            self._orientation = "Up"    
+            self.__orientation = "Up"    
         elif (right_center - right_threshold) < self.roll < (right_center + right_threshold):
-            self._orientation = "Right"
+            self.__orientation = "Right"
         elif (left_center - left_threshold) < self.roll < (left_center + left_threshold):
-            self._orientation = "Left" 
+            self.__orientation = "Left" 
         elif ((down_center - down_threshold) < self.roll <= 180) or (-180 < self.roll < (-360 + down_center + down_threshold)):
-            self._orientation = "Down"
+            self.__orientation = "Down"
 
-        return self._orientation
+        return self.__orientation

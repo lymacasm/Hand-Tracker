@@ -1,9 +1,13 @@
 import urllib2
 
 def sendToHost(comm):
-    ip = "192.168.0.104:8080"
+    try:
+        ip = "192.168.0.104:8080"
 
-    url = "http://" + ip + "/" + comm
+        url = "http://" + ip + "/" + comm
 
-    #print url
-    urllib2.urlopen(url)
+        #print url
+        urllib2.urlopen(url)
+
+    except urllib2.URLError:
+        print "Failed to send data to host"
