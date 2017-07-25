@@ -17,8 +17,9 @@ def main(argv):
             orientation = sensors.orientation
             speed = sensors.speed
             sendToHost("%s,%d" % (orientation, speed))
-            print "orientation=%s, speed=%s" % (sensors.orientation, sensors.speed)
+            #print "orientation=%s, speed=%s" % (sensors.orientation, sensors.speed)
         #print "accelMag=%s, gyroMag=%s" % (sensors.imu.magVector(sensors.imu.getAccelG()), sensors.imu.magVector(sensors.imu.getGyroDps()))
+        #print "fing1=%s,fing2=%s,fing3=%s,fings=%s" % (sensors.fing0, sensors.fing1, sensors.fing2, sensors.fings)
 
 if __name__ == "__main__":
     main(sys.argv)

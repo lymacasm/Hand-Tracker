@@ -48,7 +48,7 @@ class Sensors(object):
         time_queue = [time.time()]
         while(not self.__terminate_thread):
             # Sleep a bit so we don't use up too much of processor
-            time.sleep(0.008)
+            time.sleep(0.001)
 
             # Update IMU readings
             self.__accel_x_filter.add_data(self.imu.getAccelX())
@@ -104,7 +104,7 @@ class Sensors(object):
         if self.fings > 3000:
             return 0
         else:
-            return 100
+            return 70
 
     @property
     def fings(self):
