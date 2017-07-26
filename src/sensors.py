@@ -23,11 +23,11 @@ class Sensors(object):
         self.__gyro_x_filter = BufferFilter(7)
         self.__gyro_y_filter = BufferFilter(7)
         self.__gyro_z_filter = BufferFilter(7)
-        self.__roll_filter = BufferFilter(5)
-        self.__pitch_filter = BufferFilter(5)
-        self.__fing0_filter = BufferFilter(5)
-        self.__fing1_filter = BufferFilter(5)
-        self.__fing2_filter = BufferFilter(5)
+        self.__roll_filter = BufferFilter(3)
+        self.__pitch_filter = BufferFilter(3)
+        self.__fing0_filter = BufferFilter(3)
+        self.__fing1_filter = BufferFilter(3)
+        self.__fing2_filter = BufferFilter(3)
         self.__fing_avg_filter = BufferFilter(3)
         self.__orientation = "None"
         self.__terminate_thread = False

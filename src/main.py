@@ -16,8 +16,9 @@ def main(argv):
         if sensors.orientation != orientation or abs(sensors.speed - speed) > speed_thresh:
             orientation = sensors.orientation
             speed = sensors.speed
+            print "%s,%d" % (orientation, speed)
             sendToHost("%s,%d" % (orientation, speed))
-        #print "orientation=%s, speed=%d, fings=%d, fing1=%d, fing2=%s" % (sensors.orientation, sensors.speed, sensors.fings, sensors.fing1, sensors.fing2)
+        print "orientation=%s, roll=%s" % (sensors.orientation, sensors.roll)
         #print "accelMag=%s, gyroMag=%s" % (sensors.imu.magVector(sensors.imu.getAccelG()), sensors.imu.magVector(sensors.imu.getGyroDps()))
         #print "fing1=%s,fing2=%s,fing3=%s,fings=%s" % (sensors.fing0, sensors.fing1, sensors.fing2, sensors.fings)
         #print "fings=%d (%d,%d,%d)" % (sensors.fings, sensors.fing0, sensors.fing1, sensors.fing2)

@@ -2,7 +2,7 @@ import urllib2
 
 def sendToHost(comm):
     try:
-        ip = "192.168.0.104:8080"
+        ip = "192.168.0.105:8080"
 
         url = "http://" + ip + "/" + comm
 
